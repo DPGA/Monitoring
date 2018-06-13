@@ -10,7 +10,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
 
-include_directories(${Qt5Widgets_INCLUDES} ./include/ ../include  ${LIB_SHM_PATH}/include ${LIB_QCUSTOMPLOT_PATH}/include  ${LIB_DECODEFRAME_PATH}/include /usr/local/include)
+include_directories(${Qt5Widgets_INCLUDES} ./include/ ../include  ${LIB_SHM_PATH}/include ${LIB_QCUSTOMPLOT_PATH}/src  ${LIB_DECODEFRAME_PATH}/include /usr/local/include)
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
