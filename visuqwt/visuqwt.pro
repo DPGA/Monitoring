@@ -24,19 +24,19 @@ include ( /usr/local/qwt-6.1.3/features/qwt.prf )
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    myplotsqwt.cpp \
-    histogramme.cpp \
-    mywindow.cpp
+SOURCES += src/main.cpp\
+        src/mainwindow.cpp \
+    src/myplotsqwt.cpp \
+    src/histogramme.cpp \
+    src/mywindow.cpp
 
-HEADERS  += mainwindow.h \
-    myplotsqwt.h \
-    histogramme.h \
-    zoomer.h \
-    mywindow.h
+HEADERS  += include/mainwindow.h \
+    include/myplotsqwt.h \
+    include/histogramme.h \
+    include/zoomer.h \
+    include/mywindow.h
 
-FORMS    += mainwindow.ui
+FORMS    += src/mainwindow.ui
 
 
 INCLUDEPATH += ../../../ServeurUdp/libshm/include/

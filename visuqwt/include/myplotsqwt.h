@@ -31,16 +31,18 @@ public:
 
     explicit MyPlotsQwt(QString title,const bool zoom=false,QWidget *parent=0);
 	~MyPlotsQwt();
-    void addPoint(QPointF p, const QColor c=Qt::red, const QwtPlotCurve::CurveStyle = QwtPlotCurve::Lines, const bool add=false);
-    void setData(QVector<QPointF> p, const QColor c=Qt::red, const QwtPlotCurve::CurveStyle = QwtPlotCurve::Lines,const QwtPlot::Axis axes = Axis::yLeft);
+	void addPoint(QPointF p, const QColor c=Qt::red, const QwtPlotCurve::CurveStyle = QwtPlotCurve::Lines, const bool add=false);
+	void setData(QVector<QPointF> p, const QColor c=Qt::red, const QwtPlotCurve::CurveStyle = QwtPlotCurve::Lines,const QwtPlot::Axis axes = Axis::yLeft);
 	void setData(QVector<double> x,QVector<double>,const QColor c=Qt::red,const QwtPlotCurve::CurveStyle = QwtPlotCurve::Lines);
 	void setHisto(QVector<double> *histo,const QColor c=Qt::red);
 	void setHisto(Histogram *histo);
+	void setHisto(unsigned int num,long *histo,const QColor c);
 	void setCenterPlotMean();
 	void replotzoom();
 	void clearCurve();
 	void addTitle(QString title);
 	void setMarker(const QString s,const int size=10);
+	void setMarker(double posx);
 	
 private slots:
    void ZoomGraph();
@@ -53,6 +55,7 @@ protected :
 private :
     QwtPlotCurve *CreateCurve(const QColor c, const QwtPlotCurve::CurveStyle cs, const QwtPlot::Axis axes = QwtPlot::yLeft);
 	bool eventFilter (QObject *object, QEvent *event);
+
 	bool Zoom;
 	QString Title;
 	Histogram *h;
@@ -70,8 +73,9 @@ private :
 	bool FisrtDisplay= true;
 	QVector<QwtPlotCurve *> curve;
 	bool DisplayHisto;
-    QVector<QPointF> lCurveData;
-    QwtPlotCurve *CurveReal;
+   QVector<QPointF> lCurveData;
+   QwtPlotCurve *CurveReal;
+   QwtPlotMarker *mX;
 };
 
 

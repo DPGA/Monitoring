@@ -16,7 +16,7 @@ Histogram::Histogram( const QString &title, const QColor &symbolColor ):
     QwtPlotHistogram( title )
 {
     setStyle( QwtPlotHistogram::Columns );
-
+	 setPen (symbolColor,0.25);
     setColor( symbolColor );
 }
 

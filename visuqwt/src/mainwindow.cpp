@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //===============================================
     ShdMem = new ShmRingBuffer<SharedMemory>(CAPACITY,false,SHM_ASM_DATA);
     ShdNet = new ShmRingBuffer<sStatFrame>(CAPACITY,true,SHM_NETWORK);
+    ShdSrout = new ShmRingBuffer<sHistoSrout>(CAPACITY,false,SHM_SROUT);
     //===============================================
 
 
@@ -23,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int nbasm=0;nbasm<12;nbasm++) {
         QGridLayout *gBox = new QGridLayout;
         QGroupBox   *gTab = new QGroupBox();
+
+        // Indicateur numérique
         QGroupBox *BoxIndicateur = new QGroupBox();
         QVBoxLayout *vBox = new QVBoxLayout;
 
@@ -34,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
         BoxIndicateur->setLayout(vBox);
 
 
-        gBox->addWidget(BoxIndicateur,1,5,6,5);
+        gBox->addWidget(BoxIndicateur,1,6,6,6);
 
 // Creation des plots
         QwtText xLabelCell("Cell");
@@ -51,8 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
                 lMyPlotsQwt.back()->setAxisScale(QwtPlot::yLeft,0.0,4095.0,1000.0);
                 gBox->addWidget(lMyPlotsQwt.back(),row+1,col);
             }
+            lMyPlotshistoSrout << new MyPlotsQwt("Srout " + QString::number(row),false); 
+            lMyPlotshistoSrout.back()->setAxisScale(QwtPlot::xBottom,0.0,1024.0,500.0);
+            lMyPlotshistoSrout.back()->setAxisFont(QwtPlot::yLeft, QFont("Calibri", 8, false));
+           
+            gBox->addWidget(lMyPlotshistoSrout.back(),row+1,5);
         }
-
         gTab->setLayout(gBox);
         ui->tabWidget->addTab(gTab,"asm"+QString::number(nbasm));
     }
@@ -113,6 +120,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QTimer *timer = new QTimer();
     timer->connect(timer, SIGNAL(timeout()),this,SLOT(ReadShmData()));
     timer->start(1000); //in ms
+    QTimer *timer1 = new QTimer();
+    timer1->connect(timer1, SIGNAL(timeout()),this,SLOT(ReadHistoSrout()));
+    timer1->start(1000); //in ms
+    
     connect(ui->Persistence,SIGNAL(clicked(bool)),this,SLOT(Persistence(bool)));
     QTimer *timernet = new QTimer();
     timernet->connect(timer, SIGNAL(timeout()),this,SLOT(ReadShmNetwork()));
@@ -155,14 +166,31 @@ void MainWindow::ClearGraph()
             lMyPlotsQwt.at(Ch+index*24)->clearCurve();
 }
 
+
+
+void MainWindow::ReadHistoSrout()
+//===============================================
+//===============================================
+
+{
+	while (ShdSrout->begin() != ShdSrout->end()) {
+		sHistoSrout hSrout = ShdSrout->dump_front();
+		u8 feId = hSrout.noBoard;
+		if (feId > 0xf) feId -= 0x10;
+		qDebug() << "drs " << hSrout.nohalfDrs << " fe " << feId;
+		for (int i=0;i<6;i++)
+			lMyPlotshistoSrout.at(i+feId*6)->setHisto((unsigned int)1024,&hSrout.HistoSrout[i][0],Qt::red);
+	}
+	
+}
 void MainWindow::ReadShmData()
-//===============================================const QColor c
+//===============================================
 //===============================================
 {
    struct S_HeaderFrame *Header;
    uint16_t *buf;
 
-
+   u16 srout;
 
    while (ShdMem->begin() != ShdMem->end()) {
  //       qInfo() << "Traitement Fragment";
@@ -195,11 +223,16 @@ void MainWindow::ReadShmData()
                 x.clear();y.clear();
                 buf = GetChannel(j);
                 unsigned short Ch = GetCh();
+                srout = GetSrout();
+                qDebug() << "srout "<< srout << " ch " << Ch << " feid " << FeID << " nbsamples " << nbSamples << "check " << ui->EnableSrout->isChecked();
                 QVector <QPointF> qPoint;
                 for (int k=0;k<nbSamples;k++) {
                     qreal temp = (qreal) ntohs(buf[2+k]);
-                    qPoint.push_back(QPointF(k,temp));
-                    x.push_back(k);y.push_back(temp);
+                    qreal xtemp;
+                    if (ui->EnableSrout->isChecked()) xtemp = (qreal) ((k+srout) % 1024);
+                    else xtemp = k;
+                    qPoint.push_back(QPointF(xtemp,temp));
+                    x.push_back(xtemp);y.push_back(temp);
 //                    x.push_back(k);
 //                    double temp=(double)(ntohs(buf[2+k]));
 //                    y.push_back((double) (ntohs(buf[2+k]) & 0xfff));
@@ -210,14 +243,14 @@ void MainWindow::ReadShmData()
                     }
   */              }
 
-
-                if ((Ch >=0) && (Ch < 24)) {
+					qDebug() << " info after channel";
+					if ((Ch >=0) && (Ch < 24)) {
                     if (!m_persist) lMyPlotsQwt.at(Ch+FeID*24)->clearCurve();
-//                      lMyPlotsQwt.at(Ch+FeID*24)->setData(qPoint,Qt::red,QwtPlotCurve::Dots);
-                    lMyPlotsQwt.at(Ch+FeID*24)->setData(x,y);
-                    if (j==0) lNumber.at((Ch+FeID*24)/4)->display(lNumber.at((Ch+FeID*24)/4)->value()+1);
-                }
-             }
+                      lMyPlotsQwt.at(Ch+FeID*24)->setData(x,y);
+                    lMyPlotsQwt.at(Ch+FeID*24)->setMarker(srout);
+                  if (j==0) lNumber.at((Ch+FeID*24)/4)->display(lNumber.at((Ch+FeID*24)/4)->value()+1);
+               }
+           }
 
         }
     }

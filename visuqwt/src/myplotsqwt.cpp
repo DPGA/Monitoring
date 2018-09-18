@@ -26,7 +26,8 @@ MyPlotsQwt::MyPlotsQwt(QString title, const bool zoom, QWidget *parent)
 	canvas->setPalette( Qt::gray );
 	canvas->setBorderRadius( 10 );
 	setCanvas( canvas );
-
+	mX = NULL;
+	h = NULL;
 	plotLayout()->setAlignCanvasToScales( true );
 
 	this->replot();
@@ -154,17 +155,42 @@ void MyPlotsQwt::setData(QVector<double> x,QVector<double> y,const QColor c,cons
 	curvetemp->setPen(c,2.0);
 	curvetemp->setStyle(QwtPlotCurve::Dots);
 	curvetemp->attach(this);
+	if (mX) mX->attach(this);
 	curve.push_back(curvetemp);
-    if (ZoomActived) {
+   if (ZoomActived) {
         for (auto& item : curve)
           item->attach(PlotZoom);
+        if (mX) mX->attach(PlotZoom);
         PlotZoom->replot();
     }
     else this->replot();
 
 
 }
-
+void MyPlotsQwt::setHisto(unsigned int num,long *histo,const QColor c)
+{
+	double *dHisto = (double *) malloc(sizeof(double)*num);
+	DisplayHisto = true;
+	if (!h) 	h = new Histogram( "",c);
+	h->setColor(Qt::red);
+	for (int i=0;i<num;i++) dHisto[i] = (double) histo[i];
+	h->setValues(num,dHisto);
+	//this->setAxisScale( QwtPlot::xBottom,h->GetMean()-10,h->GetMean()+10,10);
+	
+	if (ZoomActived) {
+		h->attach(PlotZoom);
+      PlotZoom->replot();
+    }
+    else {
+		 h->attach(this);
+		 this->replot();
+	 }
+	
+	
+	replot();
+	zoomer->setZoomBase();
+	free(dHisto);
+}
 
 void MyPlotsQwt::setHisto(QVector<double> *histo,const QColor c)
 {
@@ -212,15 +238,13 @@ void MyPlotsQwt::closeEvent()
     // do what you need here
     // then call parent's procedure
     ZoomActived = false;
-    qInfo() <<"close window";
-    if (Zoom )
+    qInfo() <<"close window " << Zoom;
+    if (Zoom)
 		if (DisplayHisto) h->detach();
 		else for (auto &item:curve) item->detach();
     else 
 		if (DisplayHisto) h->attach(this);
 		else for (auto &item:curve) item->attach(this);
-
-    
 }
 
 void MyPlotsQwt::setCenterPlotMean()
@@ -238,6 +262,10 @@ void MyPlotsQwt::ZoomGraph()
         WinZoom->setMinimumSize(800, 600);
         PlotZoom = new MyPlotsQwt(Title,true);
         WinZoom->setCentralWidget(PlotZoom);
+        
+        QBrush brush = canvasBackground();
+		  brush.setColor(Qt::black);
+		  PlotZoom->setCanvasBackground(brush);
 
     if (DisplayHisto) {
        PlotZoom->setHisto(h);
@@ -247,6 +275,7 @@ void MyPlotsQwt::ZoomGraph()
     else {
       for (auto& item : curve) {
         item->attach(PlotZoom);
+        mX->attach(PlotZoom);
       }
     }
 
@@ -254,7 +283,7 @@ void MyPlotsQwt::ZoomGraph()
 	PlotZoom->replotzoom();
 
 	WinZoom->show();
-    connect(WinZoom,SIGNAL(close()),PlotZoom,SLOT(closeEvent()));
+   connect(WinZoom,SIGNAL(close()),this,SLOT(closeEvent()));    
 }
 
 void MyPlotsQwt::replotzoom()
@@ -263,7 +292,16 @@ void MyPlotsQwt::replotzoom()
 	zoomer->setZoomBase();
 }
 
-
+void MyPlotsQwt::setMarker(double posx)
+{  
+	if (!mX)	mX = new QwtPlotMarker();
+   mX->setLabel(QwtText("Srout="+ QString::number(posx)));
+   if (posx <512) mX->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+	else mX->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
+	mX->setLinePen(Qt::yellow);
+   mX->setLineStyle(QwtPlotMarker::VLine);
+   mX->setXValue(posx);
+}
 MyPlotsQwt::~MyPlotsQwt()
 {
 }

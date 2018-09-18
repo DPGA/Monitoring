@@ -32,6 +32,7 @@ public:
 private slots:
        void ReadShmData();
        void ReadShmNetwork();
+       void ReadHistoSrout();
        void ClearGraph();
        void ClearCounter();
        void Persistence(bool c);
@@ -41,7 +42,9 @@ private:
 
     double CptTrame = 0;
     ShmRingBuffer<SharedMemory> *ShdMem;
-    ShmRingBuffer<sStatFrame> *ShdNet;
+    ShmRingBuffer<sStatFrame>  *ShdNet;
+    ShmRingBuffer<sHistoSrout> *ShdSrout;
+    QList <class MyPlotsQwt *> lMyPlotshistoSrout;
     QList <class MyPlotsQwt *> lMyPlotsQwt;
     QList <class MyPlotsQwt *> lMyPlotNet;
     QList <QLCDNumber *> lNumber;

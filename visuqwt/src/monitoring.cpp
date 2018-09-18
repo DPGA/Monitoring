@@ -97,6 +97,7 @@ void monitoring::ReadShmData()
                 x.clear();y.clear();
                 buf = GetChannel(j);
                 unsigned short Ch = GetCh();
+               
                 for (int k=0;k<nbSamples;k++) {
                     x.push_back(k);
                     double temp=(double)(ntohs(buf[2+k]));
@@ -113,6 +114,7 @@ void monitoring::ReadShmData()
   //               MyPlotsQwt *mp = lMyPlotsQwt.at(Ch);
   //                if (!ui->allCurves->isChecked()) lMyPlotsQwt.at(Ch)->clearCurve();
                   lMyPlotsQwt.at(Ch)->setData(x,y);
+                  lMyPlotsQwt.at(Ch)->setMarker((double) GetSrout());
                   if (j==0) lNumber.at(Ch/4)->display(lNumber.at(Ch/4)->value()+1);
                 }
              }
