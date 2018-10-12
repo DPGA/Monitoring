@@ -46,6 +46,7 @@ private:
     ShmRingBuffer<sHistoSrout> *ShdSrout;
     QList <class MyPlotsQwt *> lMyPlotshistoSrout;
     QList <class MyPlotsQwt *> lMyPlotsQwt;
+    QList <class MyPlotsQwt *> lMyPlotsQwtQuartet;
     QList <class MyPlotsQwt *> lMyPlotNet;
     QList <QLCDNumber *> lNumber;
     bool m_persist;
@@ -56,6 +57,7 @@ private:
     QVector<QPointF>* samplesFlow;
     QList<QVector<QPointF>*> allsamplePackets;
     QList<QVector<QPointF>*> allsampleFlow;
+    QTime TimeDaq;
 
 };
 

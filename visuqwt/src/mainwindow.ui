@@ -63,6 +63,29 @@
      <attribute name="title">
       <string>Tab 1</string>
      </attribute>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>859</y>
+        <width>831</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>827</width>
+         <height>17</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
    <widget class="QCheckBox" name="EnableSrout">
@@ -85,7 +108,7 @@
      <x>0</x>
      <y>0</y>
      <width>1343</width>
-     <height>23</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>

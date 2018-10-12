@@ -89,7 +89,7 @@ void MyPlotsQwt::clearCurve()
 		}
 	}
 	else {
-		for (int i=0;i<curve.size();i++)
+		for (int i=0;i<curve.size();i++) 
 			curve.at(i)->detach();
 		curve.clear();
 	}

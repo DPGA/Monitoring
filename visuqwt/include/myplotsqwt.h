@@ -20,6 +20,26 @@
 #include <QRubberBand>
 #include "mywindow.h"
 
+#include <qwt_scale_draw.h>
+#include <QDateTime>
+
+class TimeScaleDraw: public QwtScaleDraw
+{
+public:
+    TimeScaleDraw( const QTime &base ):
+        baseTime( base )
+    {
+    }
+    virtual QwtText label( double v ) const
+    {
+        QTime upTime = baseTime.addSecs( ( int )v );
+        return upTime.toString("hh:mm");
+    }
+private:
+    QTime baseTime;
+};
+
+
 class MyPlotsQwt :  public QwtPlot
 {
   Q_OBJECT
