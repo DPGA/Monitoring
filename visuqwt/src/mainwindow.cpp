@@ -240,14 +240,16 @@ void MainWindow::ReadHistoSrout()
 //===============================================
 
 {
-	while (ShdSrout->begin() != ShdSrout->end()) {
-		sHistoSrout hSrout = ShdSrout->dump_front();
-		u8 feId = hSrout.noBoard;
-		if (feId > 0xf) feId -= 0x10;
-		qDebug() << "drs " << hSrout.nohalfDrs << " fe " << feId;
-		for (int i=0;i<6;i++)
-			lMyPlotshistoSrout.at(i+feId*6)->setHisto((unsigned int)1024,&hSrout.HistoSrout[i][0],Qt::red);
-	}
+    if ((ui->tabWidget->currentIndex() > 0) && (ui->tabWidget->currentIndex() < 13)) {
+        while (ShdSrout->begin() != ShdSrout->end()) {
+            sHistoSrout hSrout = ShdSrout->dump_front();
+            u8 feId = hSrout.noBoard;
+            if (feId > 0xf) feId -= 0x10;
+//		qDebug() << "drs " << hSrout.nohalfDrs << " fe " << feId;
+            for (int i=0;i<6;i++)
+                lMyPlotshistoSrout.at(i+feId*6)->setHisto((unsigned int)1024,&hSrout.HistoSrout[i][0],Qt::red);
+        }
+    }
 	
 }
 void MainWindow::ReadShmData()
@@ -260,7 +262,7 @@ void MainWindow::ReadShmData()
    u16 srout;
 
    while (ShdMem->begin() != ShdMem->end()) {
- //       qInfo() << "Traitement Fragment";
+//       qDebug() << ui->tabWidget->currentIndex();
         SharedMemory Packet = ShdMem->dump_front();
         SetPacket((uint16_t *) &Packet.raw[0]);
         Header = (struct S_HeaderFrame *) &Packet.raw[0];
@@ -268,20 +270,11 @@ void MainWindow::ReadShmData()
         int FeID = GetFeId(); //((ntohs(Header->FeIdK30) & 0x7f00) >> 8) - 0x10;
         if (FeID >= 0x10) FeID -= 0x10;
 
-//		unsigned long  trigthor = (ntohs(Header->CptTriggerThorMsb) << 16) + ntohs(Header->CptTriggerThorLsb);
 
-//		QString str = QString::number(trigthor,10);
-//        QString str = QString::number(GetCptTriggerThor(),10);
- //       ui->TriggerThor->display(str);
-//		qInfo() << "trig= " << trigthor << " " << hex << ntohs(Header->CptTriggerThorMsb) << " " << ntohs(Header->CptTriggerThorLsb) << dec;
 
         CptTrame++;
 
-//        ui->CptTrame->display(CptTrame);
         unsigned short nbSamples = GetNbSamples(); //ntohs(Header->NbSample);
-
-//        qInfo() << "Frond Id = " << hex << FeID + 0x10;
-//        qInfo() << "NbSamples = " << nbSamples << " len = " << (nbSamples+2)*2;
         QVector <double> x,y;
 
  //       if (ui->FrontEnd->value() == FeID)
@@ -292,7 +285,7 @@ void MainWindow::ReadShmData()
                 unsigned short Ch = GetCh();
                 if (j==0)lMyPlotsQwtQuartet.at((Ch/4)+FeID*6)->clearCurve();
                 srout = GetSrout();
-                qDebug() << "srout "<< srout << " ch " << Ch << " feid " << FeID << " nbsamples " << nbSamples << "check " << ui->EnableSrout->isChecked();
+ //               qDebug() << "srout "<< srout << " ch " << Ch << " feid " << FeID << " nbsamples " << nbSamples << "check " << ui->EnableSrout->isChecked();
                 QVector <QPointF> qPoint;
                 for (int k=0;k<nbSamples;k++) {
                     qreal temp = (qreal) ntohs(buf[2+k]);
@@ -301,34 +294,25 @@ void MainWindow::ReadShmData()
                     else xtemp = k;
                     qPoint.push_back(QPointF(xtemp,temp));
                     x.push_back(xtemp);y.push_back(temp);
-//                    x.push_back(k);
-//                    double temp=(double)(ntohs(buf[2+k]));
-//                    y.push_back((double) (ntohs(buf[2+k]) & 0xfff));
+             }
 
- /*                   if ((k<10) && (temp > 2000)){
-                        if (k==0) qDebug() << "channel " << Ch;
-                        qDebug() << ntohs(buf[2+k]) << " " << y.back() << " " << temp;
-                    }
-  */              }
-
-					qDebug() << " info after channel";
                     QColor color;
 					if ((Ch >=0) && (Ch < 24)) {
                         int halfDrs = Ch % 4;
-                        qDebug() << "half Drs " << halfDrs;
                         switch (halfDrs) {
                             case 0 : color = Qt::red;break;
-                        case 1 : color = Qt::green;break;
-                        case 2 : color = Qt::blue;break;
-                        case 3 : color = Qt::magenta;break;
+                            case 1 : color = Qt::green;break;
+                            case 2 : color = Qt::blue;break;
+                            case 3 : color = Qt::magenta;break;
                         }
-                        qDebug() << "Color " << color;
                       //if (FeID <6) 
-                      lMyPlotsQwtQuartet.at((Ch/4)+FeID*6)->setData(x,y,color);
+                      if (ui->tabWidget->currentIndex() == 13) lMyPlotsQwtQuartet.at((Ch/4)+FeID*6)->setData(x,y,color);
                       if (!m_persist) lMyPlotsQwt.at(Ch+FeID*24)->clearCurve();
-                      lMyPlotsQwt.at(Ch+FeID*24)->setData(x,y);
-                      lMyPlotsQwt.at(Ch+FeID*24)->setMarker(srout);
-                      if (j==0) lNumber.at((Ch+FeID*24)/4)->display(lNumber.at((Ch+FeID*24)/4)->value()+1);
+                      if (ui->tabWidget->currentIndex()-1 == FeID) {
+                        lMyPlotsQwt.at(Ch+FeID*24)->setData(x,y);
+                        lMyPlotsQwt.at(Ch+FeID*24)->setMarker(srout);
+                        if (j==0) lNumber.at((Ch+FeID*24)/4)->display(lNumber.at((Ch+FeID*24)/4)->value()+1);
+                      }
                     }
            }
 
@@ -342,7 +326,7 @@ void MainWindow::ReadShmNetwork()
 
     while (ShdNet->begin() - ShdNet->end()) {
         sStatFrame PacketStats = ShdNet->dump_front();
-        bool Display = true ? (ui->tabWidget->currentIndex() == 12) : false;
+        bool Display = true ? (ui->tabWidget->currentIndex() == 14) : false;
         if ((PacketStats.MemFeId > 0x9) && (PacketStats.MemFeId < 0x1c)) {
   //        samplesPacket->push_back(QPointF((PacketStats.deltaMillisec/1000),(double)((PacketStats.NumPkts - PacketStats.lastPkts))));
 			 samplesPacket->push_back(QPointF((TimeDaq.elapsed()/1000),(double)((PacketStats.NumPkts - PacketStats.lastPkts))));
@@ -358,10 +342,12 @@ void MainWindow::ReadShmNetwork()
               min=temp-60.0;
               max=temp;
           }
-          lMyPlotNet.at(PacketStats.MemFeId-0x10)->setAxisScale(QwtPlot::xBottom,(int)(TimeDaq.elapsed()/1000)-122,(int)(TimeDaq.elapsed()/1000), 60.0 );
+          if (Display) {
+            lMyPlotNet.at(PacketStats.MemFeId-0x10)->setAxisScale(QwtPlot::xBottom,(int)(TimeDaq.elapsed()/1000)-122,(int)(TimeDaq.elapsed()/1000), 60.0 );
  //         lMyPlotNet.at(PacketStats.MemFeId-0x10)->setAxisScale(QwtPlot::xBottom,min,max,30.0);
-          lMyPlotNet.at(PacketStats.MemFeId-0x10)->setData(*samplesPacket,"#0000FF");
-          lMyPlotNet.at(PacketStats.MemFeId-0x10)->setData(*samplesFlow,"#FF0000",QwtPlotCurve::Lines,QwtPlot::yRight);
+            lMyPlotNet.at(PacketStats.MemFeId-0x10)->setData(*samplesPacket,"#0000FF");
+            lMyPlotNet.at(PacketStats.MemFeId-0x10)->setData(*samplesFlow,"#FF0000",QwtPlotCurve::Lines,QwtPlot::yRight);
+          }
 
 //          lMyPlotNet.at(PacketStats.MemFeId-0x10)->addPoint(QPointF((PacketStats.deltaMillisec/1000),
 //                                                   (double)((PacketStats.NumPkts - PacketStats.lastPkts))),Qt::green);
