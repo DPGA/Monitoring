@@ -275,7 +275,7 @@ void MyPlotsQwt::ZoomGraph()
     else {
       for (auto& item : curve) {
         item->attach(PlotZoom);
-        mX->attach(PlotZoom);
+        if (mX) mX->attach(PlotZoom);
       }
     }
 

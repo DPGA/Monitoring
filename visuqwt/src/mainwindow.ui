@@ -80,8 +80,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>827</width>
-         <height>17</height>
+         <width>829</width>
+         <height>19</height>
         </rect>
        </property>
       </widget>
@@ -101,6 +101,45 @@
      <string>Srout</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="Calibration">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>10</y>
+      <width>102</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Calib</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SelectFile">
+    <property name="geometry">
+     <rect>
+      <x>970</x>
+      <y>10</y>
+      <width>221</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Select File</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="DisplayAvrg">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>40</y>
+      <width>161</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Display average</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -108,7 +147,7 @@
      <x>0</x>
      <y>0</y>
      <width>1343</width>
-     <height>30</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

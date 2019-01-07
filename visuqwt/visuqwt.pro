@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
 TARGET = visuqwt
 TEMPLATE = app
@@ -26,35 +26,36 @@ include ( /usr/local/qwt-6.1.3/features/qwt.prf )
 
 SOURCES += src/main.cpp\
         src/mainwindow.cpp \
-    src/myplotsqwt.cpp \
-    src/histogramme.cpp \
-    src/mywindow.cpp
+        src/myplotsqwt.cpp \
+        src/histogramme.cpp \
+        src/mywindow.cpp
 
 HEADERS  += include/mainwindow.h \
-    include/myplotsqwt.h \
-    include/histogramme.h \
-    include/zoomer.h \
-    include/mywindow.h
+            include/myplotsqwt.h \
+            include/histogramme.h \
+            include/zoomer.h \
+            include/mywindow.h
 
 FORMS    += src/mainwindow.ui
 
 
-INCLUDEPATH += ../../../ServeurUdp/libshm/include/
-INCLUDEPATH += ../../../ServeurUdp/libframe/include/
-INCLUDEPATH += ../../../ServeurUdp/include/
+INCLUDEPATH += ../../Lib/libshm/include/
+INCLUDEPATH += ../../Lib/libframe/include/
+INCLUDEPATH += ../../common/include/
+INCLUDEPATH += include
 
 
-INCLUDEPATH += $$PWD/../../../ServeurUdp/build/lib
-DEPENDPATH += $$PWD/../../../ServeurUdp//build/lib
+INCLUDEPATH += $$PWD/../build/lib
+DEPENDPATH += $$PWD/../build/lib
 
-unix:!macx: LIBS += -L$$PWD/../../../ServeurUdp/build/lib/ -lringshm
+unix:!macx: LIBS += -L$$PWD/../../build/lib/ -lringshm
 
-INCLUDEPATH += $$PWD/../../../ServeurUdp/build
-DEPENDPATH += $$PWD/../../../ServeurUdp/build
+INCLUDEPATH += $$PWD/../build
+DEPENDPATH += $$PWD/../build
 
-unix:!macx: LIBS += -L$$PWD/../../../ServeurUdp/build/lib/ -lframe
+unix:!macx: LIBS += -L$$PWD/../../build/lib/ -lframe
 
-INCLUDEPATH += $$PWD/../../../ServeurUdp/build
-DEPENDPATH += $$PWD/../../../ServeurUdp/build
+INCLUDEPATH += $$PWD/../build
+DEPENDPATH += $$PWD/../build
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../../ServeurUdp/build/lib/libframe.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/../../build/lib/libframe.a

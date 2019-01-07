@@ -9,7 +9,8 @@
 #include <QCheckBox>
 #include <QTimer>
 #include <QLabel>
-
+#include <QtNetwork/QUdpSocket>
+#include <QFileDialog>
 
 
 #include "shdmem.h"
@@ -36,10 +37,15 @@ private slots:
        void ClearGraph();
        void ClearCounter();
        void Persistence(bool c);
+       void ReadUdpData();
+
+       void on_SelectFile_clicked();
+
+       void on_DisplayAvrg_clicked();
 
 private:
     Ui::MainWindow *ui;
-
+    void ReadFileCalib(QFile *f);
     double CptTrame = 0;
     ShmRingBuffer<SharedMemory> *ShdMem;
     ShmRingBuffer<sStatFrame>  *ShdNet;
@@ -58,6 +64,8 @@ private:
     QList<QVector<QPointF>*> allsamplePackets;
     QList<QVector<QPointF>*> allsampleFlow;
     QTime TimeDaq;
+    qreal calib[12][24][1024];
+    QUdpSocket *udpSocket;
 
 };
 
